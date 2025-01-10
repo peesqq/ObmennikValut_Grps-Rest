@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package exchange;
+
+option go_package = "gw-exchanger/proto";
+
+// Определение сервиса
+service ExchangeService {
+  // Получение курсов обмена всех валют
+  rpc GetExchangeRates (Empty) returns (ExchangeRatesResponse);
+
+  // Получение курса обмена для конкретной валюты
+  rpc GetExchangeRateForCurrency (CurrencyRequest) returns (ExchangeRateResponse);
+  rpc ConvertCurrency (ConvertCurrencyRequest) returns (ConvertCurrencyResponse);
+}
+
+message ConvertCurrencyRequest {
+  string from_currency = 1;
+  string to_currency = 2;
+  float amount = 3;
+}
+
+// Запрос для получения курса обмена для конкретной валюты
+message CurrencyRequest {
+  string from_currency = 1;
+  string to_currency = 2;
+}
+
+message ConvertCurrencyResponse {
+  float converted_amount = 1;
+}
+
+// Ответ с курсом обмена для конкретной валюты
+message ExchangeRateResponse {
+  string from_currency = 1;
+  string to_currency = 2;
+  float rate = 3;
+}
+
+// Ответ с курсами обмена всех валют
+message ExchangeRatesResponse {
+  map<string, float> rates = 1; // ключ: валюта, значение: курс
+}
+
+// Пустое сообщение
+message Empty {}
