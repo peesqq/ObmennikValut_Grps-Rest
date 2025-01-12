@@ -5,7 +5,6 @@
 4. существующие роуты и их примеры:
 
    POST: http://localhost:8080/api/v1/wallet/exchange
-    тело:
    {
    "from_currency": "USD",
    "to_currency": "RUB",
@@ -16,7 +15,6 @@
    GET: http://localhost:8080/api/v1/balance
 
    POST: http://localhost:8080/api/v1/register
-    тело:
    {
    "username": "Ivan",
    "email": "Ivan@example.com",
@@ -24,14 +22,12 @@
    }
 
    POST: http://localhost:8080/api/v1/login
-    тело:
    {
    "currency": "usd",
    "amount": 100.0
    }
 
    POST: http://localhost:8080/api/v1/wallet/withdraw
-   тело:
    {
    "currency": "usd",
    "amount": 50.0
