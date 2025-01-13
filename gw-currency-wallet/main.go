@@ -40,7 +40,7 @@ func main() {
 			FromCurrency string  `json:"from_currency" binding:"required"`
 			ToCurrency   string  `json:"to_currency" binding:"required"`
 			Amount       float64 `json:"amount" binding:"required"`
-			UserID       int     `json:"user_id" binding:"required"` // Заменить на конкретного пользователя, если нужно
+			UserID       int     `json:"user_id" binding:"required"`
 		}
 
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -141,7 +141,7 @@ func main() {
 
 	// Получение баланса
 	r.GET("/api/v1/balance", func(c *gin.Context) {
-		userID := 1 // Заменить на ID авторизованного пользователя
+		userID := 1
 		balance, err := walletStorage.GetBalance(context.Background(), userID)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -152,7 +152,7 @@ func main() {
 
 	// Пополнение баланса
 	r.POST("/api/v1/wallet/deposit", func(c *gin.Context) {
-		userID := 1 // Заменить на ID авторизованного пользователя
+		userID := 1
 		var req struct {
 			Currency string  `json:"currency" binding:"required"`
 			Amount   float64 `json:"amount" binding:"required"`
@@ -172,7 +172,7 @@ func main() {
 
 	// Снятие средств
 	r.POST("/api/v1/wallet/withdraw", func(c *gin.Context) {
-		userID := 1 // Заменить на ID авторизованного пользователя
+		userID := 1
 		var req struct {
 			Currency string  `json:"currency" binding:"required"`
 			Amount   float64 `json:"amount" binding:"required"`
