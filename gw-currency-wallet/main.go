@@ -2,15 +2,14 @@ package main
 
 import (
 	"context"
-	"github.com/peesqq/gw-currency-wallet/internal/grpcclient"
-	"log"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/peesqq/gw-currency-wallet/gw-currency-wallet/proto"
 	"github.com/peesqq/gw-currency-wallet/internal/config"
 	"github.com/peesqq/gw-currency-wallet/internal/db"
+	"github.com/peesqq/gw-currency-wallet/internal/grpcclient"
 	"github.com/peesqq/gw-currency-wallet/internal/storages"
+	"log"
+	"net/http"
 )
 
 func main() {
@@ -25,6 +24,8 @@ func main() {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 	defer conn.Close()
+
+	db.InitDB(conn)
 
 	userStorage := storages.NewUserStorage(conn)
 
@@ -140,7 +141,7 @@ func main() {
 
 	// Получение баланса
 	r.GET("/api/v1/balance", func(c *gin.Context) {
-		userID := 16 // Заменить на ID авторизованного пользователя
+		userID := 1 // Заменить на ID авторизованного пользователя
 		balance, err := walletStorage.GetBalance(context.Background(), userID)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -151,7 +152,7 @@ func main() {
 
 	// Пополнение баланса
 	r.POST("/api/v1/wallet/deposit", func(c *gin.Context) {
-		userID := 16 // Заменить на ID авторизованного пользователя
+		userID := 1 // Заменить на ID авторизованного пользователя
 		var req struct {
 			Currency string  `json:"currency" binding:"required"`
 			Amount   float64 `json:"amount" binding:"required"`
@@ -171,7 +172,7 @@ func main() {
 
 	// Снятие средств
 	r.POST("/api/v1/wallet/withdraw", func(c *gin.Context) {
-		userID := 16 // Заменить на ID авторизованного пользователя
+		userID := 1 // Заменить на ID авторизованного пользователя
 		var req struct {
 			Currency string  `json:"currency" binding:"required"`
 			Amount   float64 `json:"amount" binding:"required"`
