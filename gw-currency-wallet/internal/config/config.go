@@ -16,17 +16,24 @@ type Config struct {
 	JWTSecret  string
 }
 
+func getEnvWithDefault(key, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
+}
+
 func LoadConfig() (*Config, error) {
 	if err := godotenv.Load("config.env"); err != nil {
-		return nil, fmt.Errorf("failed to load environment variables: %v", err)
+		fmt.Println("Warning: No config.env file found. Using default.")
 	}
 
 	return &Config{
-		DBUser:     os.Getenv("DB_USER"),
-		DBPassword: os.Getenv("DB_PASSWORD"),
-		DBName:     os.Getenv("DB_NAME"),
-		DBHost:     os.Getenv("DB_HOST"),
-		DBPort:     os.Getenv("DB_PORT"),
-		JWTSecret:  os.Getenv("JWT_SECRET"),
+		DBUser:     getEnvWithDefault("DB_USER", "default_user"),
+		DBPassword: getEnvWithDefault("DB_PASSWORD", "default_password"),
+		DBName:     getEnvWithDefault("DB_NAME", "default_db"),
+		DBHost:     getEnvWithDefault("DB_HOST", "localhost"),
+		DBPort:     getEnvWithDefault("DB_PORT", "5432"),
+		JWTSecret:  getEnvWithDefault("JWT_SECRET", "default_jwt_secret"),
 	}, nil
 }

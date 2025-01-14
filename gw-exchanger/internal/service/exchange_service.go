@@ -3,8 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
-
-	"github.com/peesqq/gw-exchanger/gw-exchanger/proto"
+	"github.com/peesqq/proto-exchange/proto"
 )
 
 type ExchangeService struct {

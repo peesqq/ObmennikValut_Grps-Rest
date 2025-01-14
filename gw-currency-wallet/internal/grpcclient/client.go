@@ -3,7 +3,7 @@ package grpcclient
 import (
 	"log"
 
-	"github.com/peesqq/gw-currency-wallet/gw-currency-wallet/proto"
+	"github.com/peesqq/proto-exchange/proto"
 
 	"google.golang.org/grpc"
 )

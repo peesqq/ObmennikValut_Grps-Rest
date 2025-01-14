@@ -2,39 +2,46 @@ package main
 
 import (
 	"context"
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
-	"github.com/peesqq/gw-currency-wallet/gw-currency-wallet/proto"
 	"github.com/peesqq/gw-currency-wallet/internal/config"
 	"github.com/peesqq/gw-currency-wallet/internal/db"
 	"github.com/peesqq/gw-currency-wallet/internal/grpcclient"
 	"github.com/peesqq/gw-currency-wallet/internal/storages"
-	"log"
-	"net/http"
+
+	"github.com/peesqq/proto-exchange/proto"
 )
 
 func main() {
-
+	// Инициализация конфига
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Error loading config: %v", err)
 	}
 
+	// Подключение к базе данных
 	conn, err := db.ConnectDB(cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBHost, cfg.DBPort)
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 	defer conn.Close()
 
+	// Инициализация базы данных
 	db.InitDB(conn)
 
+	// Инициализация хранилищ
 	userStorage := storages.NewUserStorage(conn)
-
-	grpcClient := grpcclient.NewGRPCClient("localhost:50051")
-
-	r := gin.Default()
-
 	walletStorage := storages.NewWalletStorage(conn)
 
+	// Подключение к gRPC-серверу
+	grpcClient := grpcclient.NewGRPCClient("localhost:50051")
+
+	// Создание роутера
+	r := gin.Default()
+
+	// Обработчики API
 	r.POST("/api/v1/wallet/exchange", func(c *gin.Context) {
 		var req struct {
 			FromCurrency string  `json:"from_currency" binding:"required"`
@@ -79,7 +86,6 @@ func main() {
 		})
 	})
 
-	// Регистрация
 	r.POST("/api/v1/register", func(c *gin.Context) {
 		var req struct {
 			Username string `json:"username" binding:"required"`
@@ -91,14 +97,12 @@ func main() {
 			return
 		}
 
-		// Создаём пользователя
 		err := userStorage.CreateUser(context.Background(), req.Username, req.Email, req.Password)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to register user"})
 			return
 		}
 
-		// Получаем ID нового пользователя
 		var userID int
 		query := `SELECT id FROM users WHERE username = $1`
 		err = conn.QueryRow(context.Background(), query, req.Username).Scan(&userID)
@@ -107,7 +111,6 @@ func main() {
 			return
 		}
 
-		// Создаём кошелёк для нового пользователя
 		err = walletStorage.CreateWallet(context.Background(), userID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create wallet"})
@@ -117,7 +120,6 @@ func main() {
 		c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
 	})
 
-	// Авторизация
 	r.POST("/api/v1/login", func(c *gin.Context) {
 		var req struct {
 			Username string `json:"username" binding:"required"`
@@ -134,14 +136,12 @@ func main() {
 			return
 		}
 
-		// Генерируем JWT
-		token := "TEMPORARY_JWT_TOKEN"
+		token := cfg.JWTSecret // Временный токен, заменить на реальный JWT
 		c.JSON(http.StatusOK, gin.H{"token": token})
 	})
 
-	// Получение баланса
 	r.GET("/api/v1/balance", func(c *gin.Context) {
-		userID := 1
+		userID := 1 // Заменить на ID из токена пользователя
 		balance, err := walletStorage.GetBalance(context.Background(), userID)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -150,9 +150,8 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"balance": balance})
 	})
 
-	// Пополнение баланса
 	r.POST("/api/v1/wallet/deposit", func(c *gin.Context) {
-		userID := 1
+		userID := 1 // Заменить на ID из токена пользователя
 		var req struct {
 			Currency string  `json:"currency" binding:"required"`
 			Amount   float64 `json:"amount" binding:"required"`
@@ -170,9 +169,8 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"message": "Deposit successful"})
 	})
 
-	// Снятие средств
 	r.POST("/api/v1/wallet/withdraw", func(c *gin.Context) {
-		userID := 1
+		userID := 1 // Заменить на ID из токена пользователя
 		var req struct {
 			Currency string  `json:"currency" binding:"required"`
 			Amount   float64 `json:"amount" binding:"required"`

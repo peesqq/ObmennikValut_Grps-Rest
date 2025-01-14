@@ -5,10 +5,10 @@ import (
 	"log"
 	"net"
 
-	"github.com/peesqq/gw-exchanger/gw-exchanger/proto"
 	"github.com/peesqq/gw-exchanger/internal/config"
 	"github.com/peesqq/gw-exchanger/internal/db"
 	"github.com/peesqq/gw-exchanger/internal/service"
+	"github.com/peesqq/proto-exchange/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
